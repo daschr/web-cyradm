@@ -220,17 +220,20 @@ class cyradm
 	function getquota($mb_name)
 	{
 		$output = $this->command(". getquota \"" . $mb_name . "\"");
-		if (strstr($output[0], ". NO")) {
-			$ret["used"] = "NOT-SET";
-			$ret["qmax"] = "NOT-SET";
-		} else {
-			$realoutput = str_replace(")", "", $output[0]);
-			$tok_list = split(" ", $realoutput);
-			$si_used = sizeof($tok_list) - 2;
-			$si_max = sizeof($tok_list) - 1;
-			$ret["used"] = str_replace(")", "", $tok_list[$si_used]);
-			$ret["qmax"] = $tok_list[$si_max];
+		$ret["used"] = "NOT-SET";
+		$ret["qmax"] = "NOT-SET";
+		for($pos=0; $pos < sizeof($output); ++$pos){
+			if(strstr($output[$pos],"* QUOTA")){
+				$realoutput = str_replace(")", "", $output[$pos]);
+				$tok_list = split(" ", $realoutput);
+				$si_used = sizeof($tok_list) - 2;
+				$si_max = sizeof($tok_list) - 1;
+				$ret["used"] = str_replace(")", "", $tok_list[$si_used]);
+				$ret["qmax"] = $tok_list[$si_max];
+				break;
+			}
 		}
+		
 		return $ret;
 	}  
 
